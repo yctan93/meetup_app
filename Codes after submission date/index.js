@@ -18,6 +18,7 @@ app.get('/', function(req, res){
     res.send("Meetup");
 });
 
+// User Management: 1. Signup with Email and Password
 app.post('/createNewUser/', function(req, res){
     var email = req.body.email;
     var password = req.body.password;
@@ -25,29 +26,21 @@ app.post('/createNewUser/', function(req, res){
         if (err) throw err; // not connected!
 
         connection.query("INSERT INTO users (email, password) VALUES ('" + email + "', '" + password + "');", function (error, results, fields) {
-        if (error) {
-            res.status(403).json(error);
-        } else {
-            res.status(200).send(results)
-        }
-        connection.release();
-    });
-});
-});
-
-app.get('/getAllEvents/', function(req, res){
-    pool.getConnection(function(err, connection) {
-        if (err) throw err; // not connected!
-
-        connection.query("SELECT e.name, COUNT(r.event_id) as 'Registration Count' FROM events e LEFT JOIN registration r ON r.event_id = e.event_id GROUP BY e.name", function (error, results, fields) {
-            res.status(200).send(results)
+            if (error) {
+                res.status(403).json(error);
+            } else {
+                res.status(200).send(results)
+            }
             connection.release();
-          
-            if (error) throw error;
         });
     });
 });
 
+// User Management: 2. Login with Email and Password
+// Status: Not started
+
+// Event Management: 1. Users who want to host can create Events (an Event can contain rich media content, e.g images, files)
+// Status: To implement functionality to include rich media content, e.g images, files next
 app.post('/createEvent/', function(req, res){
     pool.getConnection(function(err, connection) {
         if (err) throw err; // not connected!
@@ -62,6 +55,42 @@ app.post('/createEvent/', function(req, res){
                 res.status(200).send(results)
             }
             connection.release();
+        });
+    });
+});
+
+// Event Management: 2. Users who have created an Event can edit/delete their Event
+// Status: Not started
+
+// Event Management: 3. Users who have created an Event can see who and how many people have registered for their Event
+// Status: To implement functionality to include list of users registered for the event
+app.post('/getEventDetails/', function(req, res){
+    pool.getConnection(function(err, connection) {
+        if (err) throw err; // not connected!
+        var userId = req.body.user_id;
+        
+        connection.query("SELECT e.name, COUNT(r.event_id) AS 'Registration Count', e.user_id, u.email FROM events e LEFT JOIN registration r ON r.event_id = e.event_id LEFT JOIN users u ON u.user_id = e.user_id GROUP BY e.name HAVING e.user_id = " + userId + ";", function (error, results, fields) {
+            res.status(200).send(results)
+            connection.release();
+          
+            if (error) throw error;
+        });
+    });
+});
+
+// Event Management: 4. Users who want to attend an Event can see the list of all events and their details
+// Status: 
+//   1. To include LEFT JOIN on command after functionality to include rich media content, e.g images, files next has been implemented
+//   2. Implemented API for user to register for event
+app.get('/getAllEvents/', function(req, res){
+    pool.getConnection(function(err, connection) {
+        if (err) throw err; // not connected!
+
+        connection.query("SELECT * from events", function (error, results, fields) {
+            res.status(200).send(results)
+            connection.release();
+          
+            if (error) throw error;
         });
     });
 });
