@@ -1,12 +1,17 @@
 {
   "name": "codes-after-submission-date",
   "version": "1.0.0",
-  "description": "",
-  "main": "index_new.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "keywords": [],
+  "dependencies": {
+    "express": "^4.21.0",
+    "mysql2": "^3.11.3"
+  },
+  "description": ""
 }
