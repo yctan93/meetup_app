@@ -69,6 +69,22 @@ app.post('/getEventDetails/', function(req, res){
         if (err) throw err; // not connected!
         var userId = req.body.user_id;
         
+        /*
+            SQL command example: 
+            SELECT e.name, COUNT(r.event_id) AS 'Registration Count', e.user_id, u.email FROM events e 
+            LEFT JOIN registration r ON r.event_id = e.event_id 
+            LEFT JOIN users u ON u.user_id = e.user_id 
+            GROUP BY e.name HAVING e.user_id = 1;
+
+            SQL command output:
+            +--------+--------------------+---------+-----------------+
+            | name   | Registration Count | user_id | email           |
+            +--------+--------------------+---------+-----------------+
+            | event1 |                  2 |       1 | user1@email.com |
+            | event2 |                  1 |       1 | user1@email.com |
+            +--------+--------------------+---------+-----------------+
+        */
+
         connection.query("SELECT e.name, COUNT(r.event_id) AS 'Registration Count', e.user_id, u.email FROM events e LEFT JOIN registration r ON r.event_id = e.event_id LEFT JOIN users u ON u.user_id = e.user_id GROUP BY e.name HAVING e.user_id = " + userId + ";", function (error, results, fields) {
             res.status(200).send(results)
             connection.release();
